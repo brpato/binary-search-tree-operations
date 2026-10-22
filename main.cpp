@@ -178,7 +178,7 @@ public:
     
     void populate(){
         int demoNums[] = {5, 3, 8, 2, 4, 7, 9, 1, 6, 0};
-        for(int n : nums){
+        for(int n : demoNums){
             insert(n);
         }
     }
