@@ -195,7 +195,7 @@ public:
     }
     
     void printAll(){
-        string result = "height: " + to_string(height());
+        string result = "insert {5, 3, 8, 2, 4, 7, 9, 1, 6, 0} in this order\nheight: " + to_string(height());
         result += "\nin order: " + vToS(inOrderT());
         result += "\npre order: " + vToS(preOrderT());
         result += "\npost order: " + vToS(postOrderT());
@@ -213,6 +213,9 @@ public:
             result += "\nremove a node with key " + to_string(demoNums) + ": ";
             result += remove(demoNums) ? "done!\nnew in order: " + vToS(inOrderT()) : "not found";
         }
+        int testNum = 4;
+        result += "\ninsert a node with key " + to_string(testNum) + ": ";
+        result += insert(testNum) ? "done!\nnew in order: " + vToS(inOrderT()) : "already exists";
         cout << result << "\n\n";
     }
 };
