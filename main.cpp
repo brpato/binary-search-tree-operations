@@ -214,7 +214,7 @@ public:
             result += remove(demoNums) ? "done!\nnew in order: " + vToS(inOrderT()) : "not found";
         }
         int testNum = 4;
-        result += "\ninsert a node with key " + to_string(testNum) + ": ";
+        result += "\n\ninsert a node with key " + to_string(testNum) + ": ";
         result += insert(testNum) ? "done!\nnew in order: " + vToS(inOrderT()) : "already exists";
         cout << result << "\n\n";
     }
