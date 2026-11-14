@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <cstdlib>
 using namespace std;
 
 /*Create a node type and a BinarySearchTree class.
@@ -28,7 +27,7 @@ private:
         delete current;
     }
 
-    //recursively traverse tree in order
+    //left subtree -> current -> right subtree
     static void inOrderT(const Node* current, vector<int> &result){
         if(!current) return;
         inOrderT(current->left, result);
@@ -36,7 +35,7 @@ private:
         inOrderT(current->right, result);
     }
 
-    //recursively traverse smallest to greatest but start with root
+    //current -> left subtree -> right subtree
     static void preOrderT(const Node* current, vector<int> &result){
         if(!current) return;
         result.push_back(current->value);
@@ -44,7 +43,7 @@ private:
         preOrderT(current->right, result);
     }
 
-    //recursively traverse uhhhh
+    //left subtree -> right subtree -> current
     static void postOrderT(const Node* current, vector<int> &result){
         if(!current) return;
         postOrderT(current->left, result);
@@ -52,7 +51,6 @@ private:
         result.push_back(current->value);
     }
 
-    //recursively traverse each branch and compare the left to the right heights to figure out the biggest branch and add the root edge after
     static int height(const Node* current){
         if(!current) return -1;
         const int leftHeight = height(current->left);
@@ -63,50 +61,47 @@ private:
 public:
     ~BST(){ clear(root); }
 
-    //insert a node using a key
+    //insert a node using a value
     bool insert(const int val){
-        //no root exists, insert at root
+        //root does not exist yet
         if(!root){
             root = new Node{val};
             return true;
         }
-        //while current exists
         Node* current = root;
-        while(current){
-            //if current does not have a left child and the val is less than current, insert, otherwise keep moving down the branch
+        //traverse until node with valid child spot or matching value
+        while(true){
             if(current->value > val){
                 if(current->left == nullptr){
                     current->left = new Node{val};
                     return true;
                 }
                 current = current->left;
-                //if current does not have a right child and the val is more than current, insert, otherwise keep moving down the branch
             } else if(current->value < val){
                 if(current->right == nullptr){
                     current->right = new Node{val};
                     return true;
                 }
                 current = current->right;
+            //node with same value already exists
             } else break;
         }
         return false;
     }
 
-    //search for a node using a key
+    //search for a node using a value
     Node* search(const int val) const{
         Node* current = root;
-        while(current != nullptr){
-            //move left
+        //while current node exists, traverse until matching node value or current stops existing
+        while(current){
             if(current->value > val) current = current->left;
-                //move right
             else if(current->value < val) current = current->right;
-                //found the target node
             else return current;
         }
         return nullptr;
     }
 
-    //remove a node using a key
+    //remove a node using a value
     bool remove(const int val){
         Node* current = root;
         //root no children
@@ -116,57 +111,51 @@ public:
             return true;
         }
         Node* parent = nullptr;
+        //traverse until matching node found and track parent the entire time, or until current stops existing
         while(current){
-            //move parent to current and current left if val is less than current val
-            if(current->value > val){
-                parent = current;
-                current = current->left;
-                //move parent to current and current right if val is more than current val
-            } else if(current->value < val){
-                parent = current;
-                current = current->right;
-            } else break;
+            if(current->value == val) break;
+            parent = current;
+            if(current->value > val) current = current->left;
+            else current = current->right;
         }
-        //node should be here but doesnt exist
-        if(!current){
-            return false;
-        }
-        //non-parent node
+        //node does not exist
+        if(!current) return false;
+        //non-parent/leaf node
         if(!current->left && !current->right){
-            //detatch either left or right child of parent, whichever current is, then delete current
             if(parent->value > val) parent->left = nullptr;
             else parent->right = nullptr;
             delete current;
             return true;
         }
-        //parent with one child (including root)
+        //parent one child
         if(!current->left || !current->right){
             Node* child = current->left ? current->left : current->right;
             //root
             if(!parent) root = child;
-                //link child to parent left or right, whatever is correct then delete current
             else if(parent->value > val) parent->left = child;
             else parent->right = child;
             delete current;
             return true;
         }
-        //parent with two children (including root)
-        if(current->left && current->right){
+        //parent two children
+        else{
+            //find the next smallest value in the right branch of current
             Node* successorParent = current;
-            //find the next largest node by going right once and then left until you cant and replace successor's value with current's
+            //start with right child
             Node* successor = current->right;
+            //traverse left and track successorParent until unable
             while(successor->left){
                 successorParent = successor;
                 successor = successor->left;
             }
             current->value = successor->value;
-            //link the child of successor to successor parent and then delete successor
+            //current's right child is next valid successor
             if(successorParent == current) successorParent->right = successor->right;
+            //link successor's right child to left of successorParent to keep BST order
             else successorParent->left = successor->right;
             delete successor;
             return true;
         }
-        return false;
     }
 
     vector<int> inOrderT() const{
@@ -191,7 +180,7 @@ public:
 
     void populate(){
         int demoNums[] = {5,3,8,2,4,7,9,1,6,0};
-        for(int n: demoNums){
+        for(const int n: demoNums){
             insert(n);
         }
     }
